@@ -47,4 +47,6 @@ cd Food_Delivery
 2. **Customer site** – `cd food && npm install && npm run dev` (set `VITE_API_URL` in `.env` if the API is not on `localhost:4000`)
 3. **Admin panel** – `cd admin && npm install && npm run dev`
 
+To load the 32 sample dishes in one go, run `cd backend && npm run seed`.
+
 Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `backend/.env`, log in to the admin panel with them, and add dishes first; the customer site loads the menu from the API. Promo codes default to `WELCOME10` (10%) and `FOOD20` (20%) and can be changed with `PROMO_CODES`.
