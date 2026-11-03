@@ -1,7 +1,9 @@
 import React from 'react'
 import Sidebar from './components/Sidebar/Sidebar'
 import Navbar from './components/Navbar/Navbar'
-import { Routes ,Route, Navigate } from 'react-router-dom'
+import { Routes ,Route, Navigate, useLocation } from 'react-router-dom'
+import Login from './pages/Login/Login'
+import { getToken } from './auth'
 import Add from './pages/Add/Add'
 import List from './pages/list/List'
 import Orders from './pages/orders/Orders'
@@ -9,6 +11,13 @@ import Orders from './pages/orders/Orders'
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
+  const location = useLocation()
+  if (location.pathname === '/login') {
+    return <><ToastContainer /><Login /></>
+  }
+  if (!getToken()) {
+    return <Navigate to="/login" replace />
+  }
   return (
     <div>
       <ToastContainer />

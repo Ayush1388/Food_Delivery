@@ -1,10 +1,24 @@
-import React,{useContext} from 'react'
+import React,{useContext,useState} from 'react'
 import './Cart.css'
 import { StoreContext } from '../../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { DELIVERY_FEE } from '../../context/StoreContext';
 const Cart = () => {
 
-  const {cartItems,food_list,removeFromCart,getTotalCartAmount,url,token} = useContext(StoreContext);
+  const {cartItems,food_list,removeFromCart,getTotalCartAmount,url,token,promo,setPromo,getDiscount} = useContext(StoreContext);
+  const [promoInput,setPromoInput] = useState(promo.code);
+  const [promoMsg,setPromoMsg] = useState('');
+  const subtotal = getTotalCartAmount();
+  const applyPromo = async () => {
+    if (!token) { setPromoMsg('Please sign in to use a promo code'); return; }
+    try {
+      const r = await axios.post(url+'/api/order/promo',{code:promoInput},{headers:{token}});
+      if (r.data.success) setPromo({code:promoInput.trim().toUpperCase(),percent:r.data.percent});
+      else setPromo({code:'',percent:0});
+      setPromoMsg(r.data.message);
+    } catch { setPromoMsg('Could not check the code'); }
+  };
   const navigate = useNavigate();
   return (
     <div className='cart'>
@@ -19,7 +33,7 @@ const Cart = () => {
         </div>
         <br />
         <hr />
-        {food_list.map((item,index)=>{
+        {food_list.map((item)=>{
           if(cartItems[item._id]>0)
           {
             return (
@@ -46,15 +60,20 @@ const Cart = () => {
             <p>${getTotalCartAmount()}</p>
           </div>
           <hr />
+          {promo.percent>0 && <><div className="cart-total-details">
+            <p>Discount ({promo.code})</p>
+            <p>-${getDiscount()}</p>
+          </div>
+          <hr /></>}
           <div className="cart-total-details">
            <p> Delivery Fee </p>
-           <p>${getTotalCartAmount()===0?0:2}</p>
+           <p>${subtotal===0?0:DELIVERY_FEE}</p>
           </div>
           <hr />
 
           <div className="cart-total-details">
             <b>Total</b>
-            <b>${getTotalCartAmount()===0?0:getTotalCartAmount()+2}</b>
+            <b>${subtotal===0?0:subtotal-getDiscount()+DELIVERY_FEE}</b>
             </div>
             </div>
             <button disabled={getTotalCartAmount()===0} onClick={()=>navigate('/order')}>PROCEED TO CHECKOUT</button>
@@ -64,9 +83,10 @@ const Cart = () => {
           <div>
             <p>If you have a promo code , Enter it here</p>
             <div className="cart-promocode-input">
-              <input type="text" placeholder='promo code '/>
-              <button>Submit</button>
+              <input type="text" value={promoInput} onChange={(e)=>setPromoInput(e.target.value)} placeholder='promo code '/>
+              <button type="button" onClick={applyPromo}>Submit</button>
             </div>
+            {promoMsg && <p>{promoMsg}</p>}
           </div>
         </div>
       </div>

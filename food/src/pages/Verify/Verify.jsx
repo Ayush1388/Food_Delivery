@@ -16,7 +16,7 @@ const Verify = () => {
                 const response = await axios.post(url + "/api/order/verify", { success, orderId })
                 if (response.data.success) setCartItems({})
                 navigate(response.data.success ? "/myorders" : "/cart")
-            } catch (e) {
+            } catch {
                 navigate("/cart")
             }
         }

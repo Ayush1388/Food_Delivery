@@ -29,7 +29,7 @@ const LoginPopup = ({ SetShowLogin }) => {
             } else {
                 setError(response.data.message)
             }
-        } catch (e) {
+        } catch {
             setError("Could not reach the server")
         }
     }

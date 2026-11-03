@@ -4,6 +4,19 @@ import foodModel from "../models/foodModel.js"
 import Stripe from "stripe"
 
 const DELIVERY_FEE = 2
+// Promo codes: percentage discounts on the food subtotal. Override with PROMO_CODES="CODE:10,OTHER:20".
+const promoCodes = () => {
+    const raw = process.env.PROMO_CODES || "WELCOME10:10,FOOD20:20"
+    return Object.fromEntries(raw.split(",").map((p) => p.split(":")).map(([c, v]) => [c.trim().toUpperCase(), Number(v)]))
+}
+const discountFor = (code) => promoCodes()[String(code || "").trim().toUpperCase()] || 0
+
+const applyPromo = async (req, res) => {
+    const percent = discountFor(req.body.code)
+    if (!percent) return res.json({ success: false, message: "Invalid promo code" })
+    res.json({ success: true, percent, message: `${percent}% discount applied` })
+}
+
 const frontendUrl = () => process.env.FRONTEND_URL || "http://localhost:5173"
 
 // Place a new order. Prices are recomputed from the database, never trusted from the client.
@@ -27,7 +40,9 @@ const placeOrder = async (req, res) => {
             priced.push({ _id: food._id, name: food.name, price: food.price, quantity })
             amount += food.price * quantity
         }
-        amount += DELIVERY_FEE
+        const percent = discountFor(req.body.promoCode)
+        const discount = Math.round(amount * percent) / 100
+        amount = amount - discount + DELIVERY_FEE
 
         const order = await new orderModel({
             userId: req.userId,
@@ -52,9 +67,11 @@ const placeOrder = async (req, res) => {
                 price_data: { currency: "usd", product_data: { name: "Delivery Charges" }, unit_amount: DELIVERY_FEE * 100 },
                 quantity: 1
             })
+            const coupon = discount > 0 ? await stripe.coupons.create({ amount_off: Math.round(discount * 100), currency: "usd", duration: "once" }) : null
             const session = await stripe.checkout.sessions.create({
                 line_items,
                 mode: "payment",
+                ...(coupon ? { discounts: [{ coupon: coupon.id }] } : {}),
                 success_url: `${frontendUrl()}/verify?success=true&orderId=${order._id}`,
                 cancel_url: `${frontendUrl()}/verify?success=false&orderId=${order._id}`
             })
@@ -117,4 +134,4 @@ const updateStatus = async (req, res) => {
     }
 }
 
-export { placeOrder, verifyOrder, userOrders, listOrders, updateStatus }
+export { applyPromo, placeOrder, verifyOrder, userOrders, listOrders, updateStatus }

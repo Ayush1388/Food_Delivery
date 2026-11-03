@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 const PlaceOrder = () => {
-    const { cartItems, food_list, getTotalCartAmount, token, url, setCartItems } = useContext(StoreContext);
+    const { cartItems, food_list, getTotalCartAmount, token, url, setCartItems, promo, getDiscount } = useContext(StoreContext);
     const navigate = useNavigate()
     const [paymentMethod, setPaymentMethod] = useState("cod")
     const [error, setError] = useState("")
@@ -15,9 +15,8 @@ const PlaceOrder = () => {
     })
 
     useEffect(() => {
-        if (!token || getTotalCartAmount() === 0) {
-            navigate('/cart')
-        }
+        if (!token) navigate('/cart')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token])
 
     const onChangeHandler = (event) => {
@@ -32,7 +31,7 @@ const PlaceOrder = () => {
             .map((item) => ({ _id: item._id, quantity: cartItems[item._id] }))
         try {
             const response = await axios.post(url + "/api/order/place",
-                { address: data, items, paymentMethod }, { headers: { token } })
+                { address: data, items, paymentMethod, promoCode: promo.code }, { headers: { token } })
             if (response.data.success) {
                 if (response.data.session_url) {
                     window.location.replace(response.data.session_url)
@@ -43,7 +42,7 @@ const PlaceOrder = () => {
             } else {
                 setError(response.data.message)
             }
-        } catch (e) {
+        } catch {
             setError("Could not place the order. Please try again.")
         }
     }
@@ -76,9 +75,10 @@ const PlaceOrder = () => {
                     <div>
                         <div className="cart-total-details"><p>Subtotal</p><p>${subtotal}</p></div>
                         <hr />
+                        {promo.percent > 0 && <><div className="cart-total-details"><p>Discount ({promo.code})</p><p>-${getDiscount()}</p></div><hr /></>}
                         <div className="cart-total-details"><p>Delivery Fee</p><p>${subtotal === 0 ? 0 : DELIVERY_FEE}</p></div>
                         <hr />
-                        <div className="cart-total-details"><b>Total</b><b>${subtotal === 0 ? 0 : subtotal + DELIVERY_FEE}</b></div>
+                        <div className="cart-total-details"><b>Total</b><b>${subtotal === 0 ? 0 : subtotal - getDiscount() + DELIVERY_FEE}</b></div>
                     </div>
                     <div style={{ margin: '16px 0' }}>
                         <label style={{ display: 'block' }}>

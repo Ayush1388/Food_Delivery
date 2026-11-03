@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 export const StoreContext = createContext(null)
@@ -11,6 +12,7 @@ const StoreContextProvider = (props) => {
     const [token, setToken] = useState(localStorage.getItem("token") || "");
     const [food_list, setFoodList] = useState([]);
     const [search, setSearch] = useState("");
+    const [promo, setPromo] = useState({ code: "", percent: 0 });
 
     const authHeaders = { headers: { token } }
 
@@ -39,6 +41,8 @@ const StoreContextProvider = (props) => {
         return totalAmount;
     }
 
+    const getDiscount = () => Math.round(getTotalCartAmount() * promo.percent) / 100
+
     const fetchFoodList = async () => {
         try {
             const response = await axios.get(url + "/api/food/list")
@@ -52,7 +56,7 @@ const StoreContextProvider = (props) => {
         try {
             const response = await axios.post(url + "/api/cart/get", {}, { headers: { token: authToken } })
             if (response.data.success) setCartItems(response.data.cartData)
-        } catch (error) {
+        } catch {
             // Token is invalid/expired: log out
             setToken("")
             localStorage.removeItem("token")
@@ -63,6 +67,7 @@ const StoreContextProvider = (props) => {
         localStorage.removeItem("token")
         setToken("")
         setCartItems({})
+        setPromo({ code: "", percent: 0 })
     }
 
     useEffect(() => {
@@ -87,7 +92,10 @@ const StoreContextProvider = (props) => {
         setToken,
         logout,
         search,
-        setSearch
+        setSearch,
+        promo,
+        setPromo,
+        getDiscount
     }
 
     return (

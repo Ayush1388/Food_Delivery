@@ -14,9 +14,9 @@ import { menu_list } from '../../assets/assets'
         Choose from a diverse menu featuring a delectable array of dishes crafted with the finest ingredients and culinary expertise. Our mission is to satify your cravings and elevate your dining experience. one delicious meal at a time.
       </p>
       <div className="explore-menu-list">
-        {menu_list.map((item,index)=>{
+        {menu_list.map((item)=>{
           return (
-            <div onClick={()=>setCategory(prev=> prev===item.menu_name ? "All":item.menu_name)} className="explore-menu-list-item">
+            <div key={item.menu_name} onClick={()=>setCategory(prev=> prev===item.menu_name ? "All":item.menu_name)} className="explore-menu-list-item">
               <img className={category===item.menu_name?"active":""}src={item.menu_image} alt='' />
               <p>{item.menu_name}</p>
             </div>
