@@ -7,7 +7,7 @@ import { getToken } from './auth'
 import Add from './pages/Add/Add'
 import List from './pages/list/List'
 import Orders from './pages/orders/Orders'
- import { ToastContainer, toast } from 'react-toastify';
+ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
