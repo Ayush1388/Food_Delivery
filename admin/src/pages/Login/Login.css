@@ -1,0 +1,5 @@
+.admin-login { min-height: 100vh; display: grid; place-items: center; }
+.admin-login form { display: flex; flex-direction: column; gap: 14px; width: min(90vw, 340px); padding: 30px; border: 1px solid #a9a9a9; border-radius: 8px; }
+.admin-login input { padding: 10px; border: 1px solid #c9c9c9; border-radius: 4px; }
+.admin-login button { padding: 10px; background: tomato; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+.admin-login .error { color: tomato; font-size: 14px; }
