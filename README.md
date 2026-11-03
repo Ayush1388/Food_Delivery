@@ -27,21 +27,24 @@
 
 | Frontend | Backend | Database |
 |----------|---------|-----------|
-| HTML, CSS, JavaScript | Node.js / Express.js | (Your DB Here) |
+| React (Vite) | Node.js / Express.js | MongoDB |
 
 ---
 
 ## 🚀 Quick Start
 
+The repo has three apps: `backend/` (Express API), `food/` (customer site) and `admin/` (admin panel).
+
 ```bash
-# Clone repo
 git clone https://github.com/Ayush1388/Food_Delivery.git
-
-# Go into project folder
 cd Food_Delivery
+```
 
-# Install dependencies
-npm install
+1. **Backend** – copy `backend/.env.example` to `backend/.env`, set `MONGO_URI` and `JWT_SECRET` (optionally `STRIPE_SECRET_KEY` for card payments), then:
+   ```bash
+   cd backend && npm install && npm run server
+   ```
+2. **Customer site** – `cd food && npm install && npm run dev` (set `VITE_API_URL` in `.env` if the API is not on `localhost:4000`)
+3. **Admin panel** – `cd admin && npm install && npm run dev`
 
-# Run the app
-npm start
+Use the admin panel to add dishes first; the customer site loads the menu from the API.

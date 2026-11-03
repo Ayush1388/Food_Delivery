@@ -1,10 +1,10 @@
 import React from 'react'
 import Sidebar from './components/Sidebar/Sidebar'
-import Navbar from './components/Navbar/NAvbar'
-import { Routes ,Route } from 'react-router-dom'
-import Add from './pages/Add/add'
-import List from './pages/list/list'
-import Orders from './pages/orders/orders'
+import Navbar from './components/Navbar/Navbar'
+import { Routes ,Route, Navigate } from 'react-router-dom'
+import Add from './pages/Add/Add'
+import List from './pages/list/List'
+import Orders from './pages/orders/Orders'
  import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -17,6 +17,7 @@ const App = () => {
       <div className="app-content">
         <Sidebar />
         <Routes>
+          <Route path="/" element ={<Navigate to="/list" replace />}/>
           <Route path="/add" element ={<Add />}/>
           <Route path="/list" element ={<List />}/>
           <Route path="/orders" element ={<Orders />}/>
